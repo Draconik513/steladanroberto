@@ -3,51 +3,51 @@ import { useState, useEffect, useRef } from 'react';
 const BackgroundMusic = () => {
   const [isMusicPlaying, setIsMusicPlaying] = useState(true);
   const iframeRef = useRef(null);
+  const playerRef = useRef(null);
 
   useEffect(() => {
-    // Fungsi untuk mengontrol mute/unmute
-    const updateAudio = () => {
-      if (iframeRef.current) {
-        const iframe = iframeRef.current;
-        try {
-          // Mengubah parameter mute pada URL
-          iframe.src = `https://www.youtube.com/embed/Q49pnA4jsp8?autoplay=1&loop=1&playlist=Q49pnA4jsp8&enablejsapi=1&${isMusicPlaying ? 'mute=0' : 'mute=1'}`;
-        } catch (error) {
-          console.log('Error updating audio:', error);
-        }
-      }
-    };
+    // Load YouTube API
+    const tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.body.appendChild(tag);
 
-    updateAudio();
-  }, [isMusicPlaying]);
+    window.onYouTubeIframeAPIReady = () => {
+      playerRef.current = new window.YT.Player(iframeRef.current, {
+        events: {
+          onReady: (event) => {
+            event.target.playVideo();
+          }
+        }
+      });
+    };
+  }, []);
 
   const toggleMusic = () => {
+    if (!playerRef.current) return;
+    if (isMusicPlaying) {
+      playerRef.current.mute();
+      playerRef.current.pauseVideo();
+    } else {
+      playerRef.current.unMute();
+      playerRef.current.playVideo();
+    }
     setIsMusicPlaying(!isMusicPlaying);
   };
 
   return (
     <>
-      {/* Iframe yang sangat kecil dan diposisikan di luar layar */}
-      <div style={{ 
-        position: 'absolute', 
-        top: '-100px', 
-        left: '-100px', 
-        width: '1px', 
-        height: '1px', 
-        overflow: 'hidden' 
-      }}>
+      <div style={{ position: 'absolute', top: '-100px', left: '-100px', width: '1px', height: '1px' }}>
         <iframe
           ref={iframeRef}
           width="1"
           height="1"
-          src={`https://www.youtube.com/embed/Q49pnA4jsp8?autoplay=1&loop=1&playlist=Q49pnA4jsp8&enablejsapi=1&mute=0`}
+          src="https://www.youtube.com/embed/Q49pnA4jsp8?enablejsapi=1&autoplay=1&loop=1&playlist=Q49pnA4jsp8&mute=1"
           title="Background Music"
           frameBorder="0"
           allow="autoplay; encrypted-media"
         ></iframe>
       </div>
-      
-      {/* Tombol kontrol yang terlihat */}
+
       <div className="fixed bottom-20 right-4 z-50">
         <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg flex items-center border border-pink-200">
           <button 
