@@ -116,8 +116,6 @@
 //     </Router>
 //   )
 // }
-
-// export default App
 import { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import HomePage from './pages/HomePage'
@@ -134,23 +132,39 @@ import BackgroundMusic from './components/BackgroundMusic';
 function App() {
   const [countdownFinished, setCountdownFinished] = useState(false)
   const [isIOS, setIsIOS] = useState(false)
+  const [isBirthday, setIsBirthday] = useState(false)
 
   useEffect(() => {
     // Check if device is iOS
     setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) || 
              (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1))
     
-    // Check if countdown is finished
+    // Check if countdown is finished (for gift)
     const checkCountdown = () => {
-      const targetDate = new Date('2025-09-01T00:00:00')
+      const targetDate = new Date('2025-09-12T00:00:00')
       const now = new Date()
       if (now >= targetDate) {
         setCountdownFinished(true)
       }
     }
 
-    checkCountdown() 
-    const timer = setInterval(checkCountdown, 1000)
+    // Check if it's birthday (for memories, wishes, and celebration)
+    const checkBirthday = () => {
+      const birthdayDate = new Date('2025-09-12T00:00:00')
+      const now = new Date()
+      if (now >= birthdayDate) {
+        setIsBirthday(true)
+      }
+    }
+
+    checkCountdown()
+    checkBirthday()
+    
+    const timer = setInterval(() => {
+      checkCountdown()
+      checkBirthday()
+    }, 1000)
+    
     return () => clearInterval(timer)
   }, [])
 
@@ -158,18 +172,39 @@ function App() {
     <Router>
       <div className={`min-h-screen font-sans pb-24 ${isIOS ? 'ios-device' : ''}`}>
         <BackgroundMusic />
-        <Navigation />
+        <Navigation isBirthday={isBirthday} />
         <Routes>
-          <Route path="/" element={<PageTransition><HomePage isIOS={isIOS} /></PageTransition>} />
+          <Route path="/" element={<PageTransition><HomePage isIOS={isIOS} isBirthday={isBirthday} /></PageTransition>} />
           <Route path="/countdown" element={<PageTransition><BirthdayCountdown isIOS={isIOS} /></PageTransition>} />
-          <Route path="/wishes" element={<PageTransition><SpecialWishes isIOS={isIOS} /></PageTransition>} />
-          <Route path="/memories" element={<PageTransition><Memories isIOS={isIOS} /></PageTransition>} />
+          
+          {/* Lock wishes page until birthday */}
+          <Route 
+            path="/wishes" 
+            element={
+              isBirthday ? 
+              <PageTransition><SpecialWishes isIOS={isIOS} /></PageTransition> : 
+              <PageTransition><BirthdayCountdown isIOS={isIOS} /></PageTransition>
+            } 
+          />
+          
+          {/* Lock memories page until birthday */}
+          <Route 
+            path="/memories" 
+            element={
+              isBirthday ? 
+              <PageTransition><Memories isIOS={isIOS} /></PageTransition> : 
+              <PageTransition><BirthdayCountdown isIOS={isIOS} /></PageTransition>
+            } 
+          />
+          
           <Route path="/gift" element={<PageTransition><GiftWrapper isIOS={isIOS} /></PageTransition>} />
           <Route path="/reply" element={<PageTransition><ReplyPage isIOS={isIOS} /></PageTransition>} />
+          
+          {/* Lock celebration page until birthday */}
           <Route 
             path="/celebration" 
             element={
-              countdownFinished ? 
+              isBirthday ? 
               <PageTransition><CakeCelebration isIOS={isIOS} /></PageTransition> : 
               <PageTransition><BirthdayCountdown isIOS={isIOS} /></PageTransition>
             } 

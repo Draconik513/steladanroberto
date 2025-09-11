@@ -4,8 +4,21 @@ import ConfettiBackground from "../components/ConfettiBackground";
 import FloatingHearts from "../components/FloatingHearts";
 import heartVideo from "../assets/videos/heart-animation.mp4";
 
-const HomePage = ({ isIOS }) => {
+const HomePage = ({ isIOS, isBirthday }) => {
   const navigate = useNavigate();
+
+  const handleNavigate = (path) => {
+    // Daftar path yang memerlukan ulang tahun untuk diakses
+    const lockedPaths = ['/wishes', '/memories', '/celebration'];
+    
+    if (lockedPaths.includes(path) && !isBirthday) {
+      // Tampilkan pesan bahwa halaman terkunci
+      alert('Halaman ini akan terbuka pada 12 September 2025!');
+      return;
+    }
+    
+    navigate(path);
+  };
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
@@ -76,15 +89,13 @@ const HomePage = ({ isIOS }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5 }}
-          className="mt-12"
+          className="mt-12 space-y-4"
         >
           <motion.button
             whileHover={{ scale: isIOS ? 1 : 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => navigate("/gift")}
-
-            className="relative overflow-hidden bg-pink-500 text-white px-8 py-4 rounded-full shadow-lg text-xl font-bold"
-
+            className="relative overflow-hidden bg-pink-500 text-white px-8 py-4 rounded-full shadow-lg text-xl font-bold block mx-auto"
           >
             <span className="button-text flex items-center">
               <span className="mr-2">🎁</span>
@@ -92,6 +103,49 @@ const HomePage = ({ isIOS }) => {
               <span className="ml-2">🎁</span>
             </span>
           </motion.button>
+
+          {isBirthday && (
+            <>
+              <motion.button
+                whileHover={{ scale: isIOS ? 1 : 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => handleNavigate("/wishes")}
+                className="relative overflow-hidden bg-purple-500 text-white px-8 py-4 rounded-full shadow-lg text-xl font-bold block mx-auto"
+              >
+                <span className="button-text flex items-center">
+                  <span className="mr-2">💌</span>
+                  Pesan Spesial
+                  <span className="ml-2">💌</span>
+                </span>
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: isIOS ? 1 : 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => handleNavigate("/memories")}
+                className="relative overflow-hidden bg-blue-500 text-white px-8 py-4 rounded-full shadow-lg text-xl font-bold block mx-auto"
+              >
+                <span className="button-text flex items-center">
+                  <span className="mr-2">📸</span>
+                  Kenangan Indah
+                  <span className="ml-2">📸</span>
+                </span>
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: isIOS ? 1 : 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => handleNavigate("/celebration")}
+                className="relative overflow-hidden bg-green-500 text-white px-8 py-4 rounded-full shadow-lg text-xl font-bold block mx-auto"
+              >
+                <span className="button-text flex items-center">
+                  <span className="mr-2">🎂</span>
+                  Rayakan!
+                  <span className="ml-2">🎂</span>
+                </span>
+              </motion.button>
+            </>
+          )}
         </motion.div>
       </div>
     </div>

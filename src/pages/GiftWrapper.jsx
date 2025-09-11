@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import Confetti from 'react-confetti'
 import useWindowSize from 'react-use/lib/useWindowSize'
 
-const GiftWrapper = () => {
+const GiftWrapper = ({ isIOS }) => {
   const { width, height } = useWindowSize()
   const [isUnwrapping, setIsUnwrapping] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
@@ -12,18 +12,18 @@ const GiftWrapper = () => {
   const [showMessage, setShowMessage] = useState(false)
   const navigate = useNavigate()
 
-  // Check if countdown is finished (August 10, 2025)
+  // Check if countdown is finished (September 12, 2025)
   useEffect(() => {
-    const checkCountdown = () => {
-      const targetDate = new Date('2025-09-01T00:00:00')
+    const checkBirthday = () => {
+      const birthdayDate = new Date('2025-09-12T00:00:00')
       const now = new Date()
-      if (now >= targetDate) {
+      if (now >= birthdayDate) {
         setCountdownFinished(true)
       }
     }
 
-    checkCountdown()
-    const timer = setInterval(checkCountdown, 1000)
+    checkBirthday()
+    const timer = setInterval(checkBirthday, 1000)
     return () => clearInterval(timer)
   }, [])
 
